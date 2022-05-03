@@ -1,15 +1,20 @@
 import faust
+from pydantic import BaseSettings
 
-KAFKA_HOST_URL = "localhost:9092"
-BATCH_SIZE = 5
-BATCH_WINDOW_SECONDS = 10
+
+class Config(BaseSettings):
+    kafka_host_url: str
+    batch_size: int
+    batch_window_seconds: int
 
 
 class Vote(faust.Record):
     participant_id: int
 
 
-app = faust.App("vote_processor", broker=KAFKA_HOST_URL)
+config = Config()
+
+app = faust.App("vote_processor", broker=config.kafka_host_url)
 votes_topic = app.topic("votes", value_type=Vote)
 
 
@@ -19,5 +24,5 @@ def process_votes(votes: list[Vote]):
 
 @app.agent(votes_topic)
 async def process(votes: faust.Stream):
-    async for batch in votes.take(BATCH_SIZE, within=BATCH_WINDOW_SECONDS):
+    async for batch in votes.take(config.batch_size, within=config.batch_window_seconds):
         process_votes(batch)
