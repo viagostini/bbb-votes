@@ -61,6 +61,7 @@ start-api:
 start-processors:
 	@$(call message,"Starting vote processors")
 	@$(COMPOSE_UP) vote_processor_1
+	@$(COMPOSE_UP) vote_processor_2
 
 start:
 	@$(call note,"Starting all containers")
