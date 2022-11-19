@@ -24,6 +24,7 @@ services:
       - .env
     depends_on:
       - redpanda
+      - db
 
   vote_processor_2:
     build: .
@@ -37,6 +38,7 @@ services:
       - .env
     depends_on:
       - redpanda
+      - db
 
   redpanda:
     image: vectorized/redpanda:v22.1.10
@@ -53,3 +55,12 @@ services:
       - --advertise-kafka-addr redpanda:9092
     ports:
       - 9092:9092
+
+  db:
+    image: postgres:15.1
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql

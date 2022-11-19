@@ -50,6 +50,11 @@ start-redpanda:
 	@$(COMPOSE_UP) redpanda
 	@$(MAKE) wait-2
 
+start-database:
+	@$(call message,"Starting Database")
+	@$(COMPOSE_UP) db
+	@$(MAKE) wait-2
+
 create-votes-topic:
 	@$(call message,"Creating votes topic")
 	@$(COMPOSE_EXEC) redpanda rpk topic create votes -p 10
@@ -66,6 +71,7 @@ start-processors:
 start:
 	@$(call note,"Starting all containers")
 	@$(MAKE) start-redpanda
+	@$(MAKE) start-database
 	@$(MAKE) wait-2
 	@$(MAKE) create-votes-topic
 	@$(MAKE) start-api
@@ -76,3 +82,6 @@ stop:
 	@$(call note,"Stopping all containers")
 	@$(COMPOSE) down -v
 	@$(call success,"Done")
+
+check-votes:
+	@$(COMPOSE_EXEC) -ti db psql postgresql://admin:admin@db/admin -c "select * from participants order by id"
