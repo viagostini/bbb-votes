@@ -1,10 +1,10 @@
-FROM python:3.9.12-slim
+FROM python:3.10.8-slim
 
 WORKDIR /usr/src
 
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=off \
-    POETRY_VERSION=1.1.13 \
+    POETRY_VERSION=1.2.2 \
     POETRY_VIRTUALENVS_CREATE=false \
     POETRY_CACHE_DIR=/usr/src/poetry_cache/ 
 
