@@ -1,5 +1,8 @@
 import faust
 from pydantic import BaseSettings
+from sqlalchemy import select
+
+from bbb.db import Participant, session
 
 
 class Config(BaseSettings):
@@ -19,7 +22,15 @@ votes_topic = app.topic("votes", value_type=Vote)
 
 
 def process_votes(votes: list[Vote]):
-    print([vote.asdict() for vote in votes])
+    votes_to_id = {1: 0, 2: 0, 3: 0}
+
+    for vote in votes:
+        votes_to_id[vote.participant_id] += 1
+
+    for participant in session.scalars(select(Participant)):
+        participant.votes += votes_to_id[participant.id]
+
+    session.commit()
 
 
 @app.agent(votes_topic)
