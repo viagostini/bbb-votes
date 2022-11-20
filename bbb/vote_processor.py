@@ -2,7 +2,7 @@ import faust
 from pydantic import BaseSettings
 from sqlalchemy import select
 
-from bbb.core import Participant
+from bbb.core import Participant, Vote, add_votes, count_votes
 from bbb.db import session
 
 
@@ -12,10 +12,6 @@ class Config(BaseSettings):
     batch_window_seconds: int
 
 
-class Vote(faust.Record):
-    participant_id: int
-
-
 config = Config()
 
 app = faust.App("vote_processor", broker=config.kafka_host_url)
@@ -23,13 +19,10 @@ votes_topic = app.topic("votes", value_type=Vote)
 
 
 def process_votes(votes: list[Vote]):
-    votes_to_id = {1: 0, 2: 0, 3: 0}
+    votes_to_id = count_votes(votes)
+    participants = session.scalars(select(Participant))
 
-    for vote in votes:
-        votes_to_id[vote.participant_id] += 1
-
-    for participant in session.scalars(select(Participant)):
-        participant.votes += votes_to_id[participant.id]
+    add_votes(participants, votes_to_id)
 
     session.commit()
 
