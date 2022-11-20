@@ -2,7 +2,8 @@ import faust
 from pydantic import BaseSettings
 from sqlalchemy import select
 
-from bbb.db import Participant, session
+from bbb.core import Participant
+from bbb.db import session
 
 
 class Config(BaseSettings):

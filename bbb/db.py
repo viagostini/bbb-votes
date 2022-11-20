@@ -1,16 +1,19 @@
-from sqlalchemy import Column, Integer, String, create_engine
-from sqlalchemy.orm import Session, declarative_base
+from sqlalchemy import Column, Integer, MetaData, String, Table, create_engine
+from sqlalchemy.orm import Session, mapper
 
-Base = declarative_base()
+from bbb.core import Participant
 
+metadata = MetaData()
 
-class Participant(Base):
-    __tablename__ = "participants"
+participants = Table(
+    "participants",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("name", String(50), nullable=False),
+    Column("votes", Integer, default=0),
+)
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String(50), nullable=False)
-    votes = Column(Integer, default=0)
-
+participants_mapper = mapper(Participant, participants)
 
 engine = create_engine("postgresql+psycopg2://admin:admin@db/admin", echo=True, future=True)
 session = Session(engine)
