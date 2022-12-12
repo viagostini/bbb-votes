@@ -2,7 +2,7 @@ import json
 
 from aiokafka import AIOKafkaProducer
 from fastapi import FastAPI
-from pydantic import BaseSettings
+from pydantic import BaseSettings, conint
 
 
 class Config(BaseSettings):
@@ -31,7 +31,7 @@ async def stop_producer():
 
 
 @api.get("/vote/{participant_id}", status_code=202)
-async def vote(participant_id: int):
+async def vote(participant_id: conint(ge=1, le=3)):
     await producer.send(config.kafka_votes_topic, {"participant_id": participant_id})
 
     return {"status": "OK", "participant_id": participant_id}
