@@ -30,7 +30,7 @@ async def stop_producer():
     await producer.stop()
 
 
-@api.get("/vote/{participant_id}")
+@api.get("/vote/{participant_id}", status_code=202)
 async def vote(participant_id: int):
     await producer.send_and_wait(config.kafka_votes_topic, {"participant_id": participant_id})
 
